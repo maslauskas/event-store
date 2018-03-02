@@ -1,0 +1,33 @@
+{
+    "name": "maslauskas/event-store",
+    "description": "Simple event store for Laravel using MySQL",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tadas Maslauskas",
+            "email": "maslauskas.t@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Maslauskas\\EventStore\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Maslauskas\\EventStore\\EventStoreServiceProvider"
+            ],
+            "aliases": {
+                "EventStore": "Maslauskas\\EventStore\\EventStoreFacade"
+            }
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.5"
+    }
+}
