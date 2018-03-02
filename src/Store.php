@@ -35,7 +35,7 @@ class Store
             ]);
 
             if($before) {
-                $event->metadata['before'] = $before;
+                $event->metadata = array_merge($event->metadata ?: [], ['before' => $before]);
             }
 
             $event->setStream($event_type);
