@@ -48,7 +48,7 @@ class EventStoreTest extends TestCase
     {
         $this->addDedicatedTablesToConfig();
 
-        $table = (new \Maslauskas\EventStore\StoreEvent())->getEventTableName('custom_event_1');
+        $table = (new \Maslauskas\EventStore\StoreEvent())->getStream('custom_event_1');
         $this->assertEquals('custom_event_table', $table);
     }
 
@@ -57,7 +57,7 @@ class EventStoreTest extends TestCase
     {
         $this->addDedicatedTablesToConfig();
 
-        $event = (new \Maslauskas\EventStore\StoreEvent())->setEventTable('custom_event_1');
+        $event = (new \Maslauskas\EventStore\StoreEvent())->setStream('custom_event_1');
         $this->assertEquals('custom_event_table', $event->getTable());
     }
 
@@ -73,12 +73,12 @@ class EventStoreTest extends TestCase
     /** @test */
     function it_does_not_create_custom_table_if_it_already_exists()
     {
-        EventStore::createDedicatedTable('custom_table');
+        EventStore::createStreamTable('custom_table');
 
         $event = new \Maslauskas\EventStore\StoreEvent();
         $event->setTable('custom_table');
 
-        $this->assertFalse($event->needsDedicatedTableCreation());
+        $this->assertFalse($event->needsDedicatedStreamTableCreation());
     }
 
     /** @test */
@@ -126,7 +126,7 @@ class EventStoreTest extends TestCase
 
     private function addDedicatedTablesToConfig()
     {
-        $this->app['config']->set('eventstore.dedicated_tables', [
+        $this->app['config']->set('eventstore.streams', [
             'custom_event_table' => [
                 'custom_event_1',
                 'custom_event_2',

@@ -16,10 +16,10 @@ class AddEventStoreTable extends Migration
         $schema = Schema::connection(config('eventstore.connection'));
 
         $schema->create(config('eventstore.table'), function(Blueprint $table) {
+            $table->bigIncrements('event_id')->index();
             $table->string('event_type')->index();
             $table->unsignedInteger('target_id')->nullable()->index();
             $table->longText('payload');
-            $table->longText('before')->nullable();
             $table->longText('metadata')->nullable();
             $table->timestamp('created_at')->default(DB::raw("CURRENT_TIMESTAMP"))->index();
         });

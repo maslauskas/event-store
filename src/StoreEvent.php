@@ -30,7 +30,7 @@ class StoreEvent extends Model
      */
     protected $casts = [
         'payload' => 'array',
-        'before' => 'array',
+        'metadata' => 'array'
     ];
 
     /**
@@ -42,9 +42,9 @@ class StoreEvent extends Model
      * @param $event
      * @return $this
      */
-    public function setEventTable($event)
+    public function setStream($event)
     {
-        $table = $this->getEventTableName($event);
+        $table = $this->getStream($event);
         $this->setTable($table);
 
         return $this;
@@ -54,9 +54,9 @@ class StoreEvent extends Model
      * @param $event
      * @return \Illuminate\Config\Repository|int|mixed|string
      */
-    public function getEventTableName($event)
+    public function getStream($event)
     {
-        $dedicated_tables = config('eventstore.dedicated_tables');
+        $dedicated_tables = config('eventstore.streams');
 
         if(empty($dedicated_tables)) {
             return config('eventstore.table');
@@ -74,7 +74,7 @@ class StoreEvent extends Model
     /**
      * @return bool
      */
-    public function needsDedicatedTableCreation()
+    public function needsDedicatedStreamTableCreation()
     {
         return $this->getTable() !== config('eventstore.table')
             && !Schema::connection(config('eventstore.connection'))->hasTable($this->getTable());

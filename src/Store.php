@@ -28,19 +28,23 @@ class Store
         }
 
         try {
-            $event = new StoreEvent();
-            $event->setEventTable($event_type);
-
-            if($event->needsDedicatedTableCreation()) {
-                $this->createDedicatedTable($event->getTable());
-            }
-
-            $event->create([
+            $event = new StoreEvent([
                 'event_type' => $event_type,
                 'payload' => $payload,
                 'target_id' => $target_id,
-                'before' => $before,
             ]);
+
+            if($before) {
+                $event->metadata['before'] = $before;
+            }
+
+            $event->setStream($event_type);
+
+            if($event->needsDedicatedStreamTableCreation()) {
+                $this->createStreamTable($event->getTable());
+            }
+
+            $event->save();
         } catch (\Exception $e) {
             if($this->withExceptions) throw $e;
         }
@@ -66,16 +70,16 @@ class Store
         return $this;
     }
 
-    public function createDedicatedTable($table)
+    public function createStreamTable($table)
     {
         DB::transaction(function() use ($table) {
             $schema = Schema::connection(config('eventstore.connection'));
 
             $schema->create($table, function(Blueprint $builder) {
+                $builder->bigIncrements('event_id')->index();
                 $builder->string('event_type')->index();
                 $builder->unsignedInteger('target_id')->nullable()->index();
                 $builder->longText('payload');
-                $builder->longText('before')->nullable();
                 $builder->longText('metadata')->nullable();
                 $builder->timestamp('created_at')->default(DB::raw("CURRENT_TIMESTAMP"))->index();
             });

@@ -9,7 +9,7 @@ return [
     /**
      * Here you can set dedicated tables for certain events to be stored in.
      */
-    'dedicated_tables' => [
+    'streams' => [
         // 'custom_table' => [
         //     'custom_event_1',
         //     'custom_event_2',
