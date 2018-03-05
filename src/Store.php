@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Maslauskas\EventStore\Exceptions\EventModelClassNotFound;
 
 class Store
 {
@@ -20,6 +19,7 @@ class Store
      * @param      $payload
      * @param null $target_id
      * @param null $before
+     * @throws \Exception
      */
     public function add($event_type, $payload, $target_id = null, $before = null)
     {
@@ -51,6 +51,37 @@ class Store
     }
 
     /**
+     * Add multiple entries of the same event at once using a single query.
+     * Disclaimer: this method does not fire any Eloquent model events.
+     *
+     * @param       $event_type
+     * @param array $events
+     * @throws \Exception
+     */
+    public function addMany($event_type, array $events)
+    {
+        try {
+            $event = new StoreEvent();
+            $event->setStream($event_type);
+
+            if($event->needsDedicatedStreamTableCreation()) {
+                $this->createStreamTable($event->getTable());
+            }
+
+            $events = array_map(function($e) use ($event_type) {
+                return [
+                    'event_type' => $event_type,
+                    'payload' => json_encode($e),
+                ];
+            }, $events);
+
+            $event->insert($events);
+        } catch (\Exception $e) {
+            if($this->withExceptions) throw $e;
+        }
+    }
+
+    /**
      * @return $this
      */
     public function withExceptions()
@@ -70,6 +101,9 @@ class Store
         return $this;
     }
 
+    /**
+     * @param $table
+     */
     public function createStreamTable($table)
     {
         DB::transaction(function() use ($table) {

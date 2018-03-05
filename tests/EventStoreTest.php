@@ -93,6 +93,38 @@ class EventStoreTest extends TestCase
         ]);
     }
 
+    /** @test */
+    function it_inserts_multiple_events_at_once()
+    {
+        EventStore::withExceptions()->addMany('some_event', [
+            ['key' => 'foo'],
+            ['key' => 'bar'],
+            ['key' => 'baz'],
+        ]);
+
+        $this->assertDatabaseHas('event_store', [
+            'event_type' => 'some_event',
+            'payload' => json_encode(['key' => 'baz'])
+        ]);
+    }
+
+    /** @test */
+    function it_inserts_multiple_events_at_once_to_dedicated_table()
+    {
+        $this->addDedicatedTablesToConfig();
+
+        EventStore::withExceptions()->addMany('custom_event_1', [
+            ['key' => 'foo'],
+            ['key' => 'bar'],
+            ['key' => 'baz'],
+        ]);
+
+        $this->assertDatabaseHas('custom_event_table', [
+            'event_type' => 'custom_event_1',
+            'payload' => json_encode(['key' => 'bar'])
+        ]);
+    }
+
     protected function getPackageProviders($app)
     {
         return [\Maslauskas\EventStore\EventStoreServiceProvider::class];
