@@ -1,19 +1,13 @@
 <?php
 
-use Orchestra\Testbench\TestCase;
+namespace Tests;
 
-class EventStoreTest extends TestCase
+use Maslauskas\EventStore\EventStoreFacade as EventStore;
+use Maslauskas\EventStore\Store;
+use Maslauskas\EventStore\StoreEvent;
+
+class EventStoreTest extends EventStoreTestCase
 {
-    /**
-     * Setup the test environment.
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->artisan('migrate');
-    }
-
     /** @test */
     function it_registers_testing_config()
     {
@@ -30,7 +24,7 @@ class EventStoreTest extends TestCase
     /** @test */
     function it_registers_helper_function()
     {
-        $this->assertInstanceOf(\Maslauskas\EventStore\Store::class, eventstore());
+        $this->assertInstanceOf(Store::class, eventstore());
     }
 
     /** @test */
@@ -48,7 +42,7 @@ class EventStoreTest extends TestCase
     {
         $this->addDedicatedTablesToConfig();
 
-        $table = (new \Maslauskas\EventStore\StoreEvent())->getStream('custom_event_1');
+        $table = (new StoreEvent())->getStream('custom_event_1');
         $this->assertEquals('custom_event_table', $table);
     }
 
@@ -57,7 +51,7 @@ class EventStoreTest extends TestCase
     {
         $this->addDedicatedTablesToConfig();
 
-        $event = (new \Maslauskas\EventStore\StoreEvent())->setStream('custom_event_1');
+        $event = (new StoreEvent())->setStream('custom_event_1');
         $this->assertEquals('custom_event_table', $event->getTable());
     }
 
@@ -75,7 +69,7 @@ class EventStoreTest extends TestCase
     {
         EventStore::createStreamTable('custom_table');
 
-        $event = new \Maslauskas\EventStore\StoreEvent();
+        $event = new StoreEvent();
         $event->setTable('custom_table');
 
         $this->assertFalse($event->needsDedicatedStreamTableCreation());
@@ -122,47 +116,6 @@ class EventStoreTest extends TestCase
         $this->assertDatabaseHas('custom_event_table', [
             'event_type' => 'custom_event_1',
             'payload' => json_encode(['key' => 'bar'])
-        ]);
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [\Maslauskas\EventStore\EventStoreServiceProvider::class];
-    }
-
-    protected function getPackageAliases($app)
-    {
-        return [
-            'EventStore' => \Maslauskas\EventStore\EventStoreFacade::class
-        ];
-    }
-
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'eventstore');
-        $app['config']->set('eventstore.connection', 'eventstore');
-
-        $app['config']->set('database.connections.eventstore', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
-        ]);
-    }
-
-    private function addDedicatedTablesToConfig()
-    {
-        $this->app['config']->set('eventstore.streams', [
-            'custom_event_table' => [
-                'custom_event_1',
-                'custom_event_2',
-            ],
         ]);
     }
 }

@@ -82,6 +82,49 @@ class Store
     }
 
     /**
+     * Gets the StoreEvent model query Builder instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function query()
+    {
+        return (new StoreEvent())->newQuery();
+    }
+
+    /**
+     * Gets all entries for a specific event.
+     * Returns entries from default table if $event param is null.
+     *
+     * @param null $event
+     * @return mixed
+     */
+    public function get($event = null)
+    {
+        $query = new StoreEvent();
+
+        if($event) {
+            $query->setStream($event);
+            $query = $query->where('event_type', $event);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Gets all event entries from a specific stream table.
+     *
+     * @param $stream
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function stream($stream)
+    {
+        $query = new StoreEvent();
+        $query = $query->setTable($stream);
+
+        return $query->newQuery();
+    }
+
+    /**
      * @return $this
      */
     public function withExceptions()

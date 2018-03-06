@@ -72,6 +72,9 @@ class StoreEvent extends Model
     }
 
     /**
+     * Checks if event model needs a dedicated table
+     * and creates it if it does not exist.
+     *
      * @return bool
      */
     public function needsDedicatedStreamTableCreation()
@@ -80,6 +83,13 @@ class StoreEvent extends Model
             && !Schema::connection(config('eventstore.connection'))->hasTable($this->getTable());
     }
 
+    /**
+     * Override default Eloquent Builder newInstance method.
+     *
+     * @param array $attributes
+     * @param bool  $exists
+     * @return static
+     */
     public function newInstance($attributes = [], $exists = false)
     {
         $model = parent::newInstance($attributes, $exists);
