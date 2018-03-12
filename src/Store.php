@@ -157,7 +157,7 @@ class Store
      */
     public function createStreamTable($table)
     {
-        DB::transaction(function() use ($table) {
+        DB::connection(config('eventstore.connection'))->transaction(function() use ($table) {
             $schema = Schema::connection(config('eventstore.connection'));
 
             $schema->create($table, function(Blueprint $builder) {
