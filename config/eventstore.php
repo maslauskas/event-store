@@ -6,6 +6,8 @@ return [
 
     'table' => env('EVENT_STORE_TABLE', 'event_store'),
 
+    'throw_exceptions' => false,
+
     /**
      * Here you can set dedicated tables for certain events to be stored in.
      */

@@ -12,7 +12,15 @@ class Store
     /**
      * @var bool
      */
-    private $withExceptions = true;
+    private $withExceptions;
+
+    /**
+     * Event Store class constructor
+     */
+    public function __construct() 
+    {
+        $this->withExceptions = config('eventstore.throw_exceptions');
+    }
 
     /**
      * @param      $event_type
