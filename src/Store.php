@@ -17,7 +17,7 @@ class Store
     /**
      * Event Store class constructor
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->withExceptions = config('eventstore.throw_exceptions');
     }
@@ -87,6 +87,35 @@ class Store
         } catch (\Exception $e) {
             if($this->withExceptions) throw $e;
         }
+    }
+
+    /**
+     * @param Model $model
+     * @param array $exclude
+     * @param int   $numberDecimals
+     * @return array
+     */
+    public function getChangedModelValues(Model $model, array $exclude = ['created_at', 'updated_at', 'deleted_at'], $numberDecimals = 4)
+    {
+        $changed = [];
+        $attributes = collect($model->getAttributes())->except($exclude);
+
+        if (!$attributes)
+            return $changed;
+
+        foreach ($attributes as $key => $after) {
+            $before = $model->getOriginal($key);
+
+            if ($model->originalIsEquivalent($key, $after) ||
+                (is_numeric($before) && is_numeric($after) && number_format($before, $numberDecimals, '.', '') == number_format($after, $numberDecimals, '.', ''))
+            )
+                continue;
+
+            $changed['before'][$key] = $before;
+            $changed['after'][$key] = $after;
+        }
+
+        return $changed;
     }
 
     /**
