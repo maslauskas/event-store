@@ -4,19 +4,18 @@ namespace Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Maslauskas\EventStore\EventStoreFacade as EventStore;
-use Maslauskas\EventStore\QueryBuilder;
 
 class QueryTest extends EventStoreTestCase
 {
     /** @test */
-    function it_returns_query_builder_when_using_query_method()
+    public function it_returns_query_builder_when_using_query_method()
     {
         $events = eventstore()->query();
         $this->assertInstanceOf(Builder::class, $events);
     }
 
     /** @test */
-    function it_gets_all_events()
+    public function it_gets_all_events()
     {
         EventStore::withExceptions()->addMany('custom_event_1', [
             ['key' => 'foo'],
@@ -31,7 +30,7 @@ class QueryTest extends EventStoreTestCase
     }
 
     /** @test */
-    function it_gets_all_events_for_specific_stream()
+    public function it_gets_all_events_for_specific_stream()
     {
         $this->addDedicatedTablesToConfig();
 
@@ -58,7 +57,7 @@ class QueryTest extends EventStoreTestCase
     }
 
     /** @test */
-    function it_gets_all_events_for_specific_event_type()
+    public function it_gets_all_events_for_specific_event_type()
     {
         EventStore::withExceptions()->addMany('regular_event', [
             ['key' => 'foo'],
@@ -81,7 +80,7 @@ class QueryTest extends EventStoreTestCase
     }
 
     /** @test */
-    function it_gets_all_events_for_specific_event_type_with_dedicated_stream()
+    public function it_gets_all_events_for_specific_event_type_with_dedicated_stream()
     {
         $this->addDedicatedTablesToConfig();
 

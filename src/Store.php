@@ -2,10 +2,10 @@
 
 namespace Maslauskas\EventStore;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 
 class Store
 {
@@ -15,9 +15,9 @@ class Store
     private $withExceptions;
 
     /**
-     * Event Store class constructor
+     * Event Store class constructor.
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->withExceptions = config('eventstore.throw_exceptions');
     }
@@ -31,7 +31,7 @@ class Store
      */
     public function add($event_type, $payload, $target_id = null, $before = null)
     {
-        if($before instanceof Model) {
+        if ($before instanceof Model) {
             $before = array_only($before->attributesToArray(), array_keys($payload));
         }
 
@@ -42,19 +42,21 @@ class Store
                 'target_id' => $target_id,
             ]);
 
-            if($before) {
+            if ($before) {
                 $event->metadata = array_merge($event->metadata ?: [], ['before' => $before]);
             }
 
             $event->setStream($event_type);
 
-            if($event->needsDedicatedStreamTableCreation()) {
+            if ($event->needsDedicatedStreamTableCreation()) {
                 $this->createStreamTable($event->getTable());
             }
 
             $event->save();
         } catch (\Exception $e) {
-            if($this->withExceptions) throw $e;
+            if ($this->withExceptions) {
+                throw $e;
+            }
         }
     }
 
@@ -72,11 +74,11 @@ class Store
             $event = new StoreEvent();
             $event->setStream($event_type);
 
-            if($event->needsDedicatedStreamTableCreation()) {
+            if ($event->needsDedicatedStreamTableCreation()) {
                 $this->createStreamTable($event->getTable());
             }
 
-            $events = array_map(function($e) use ($event_type) {
+            $events = array_map(function ($e) use ($event_type) {
                 return [
                     'event_type' => $event_type,
                     'payload' => json_encode($e),
@@ -85,7 +87,9 @@ class Store
 
             $event->insert($events);
         } catch (\Exception $e) {
-            if($this->withExceptions) throw $e;
+            if ($this->withExceptions) {
+                throw $e;
+            }
         }
     }
 
@@ -110,7 +114,7 @@ class Store
     {
         $query = new StoreEvent();
 
-        if($event) {
+        if ($event) {
             $query->setStream($event);
             $query = $query->where('event_type', $event);
         }
@@ -157,16 +161,16 @@ class Store
      */
     public function createStreamTable($table)
     {
-        DB::connection(config('eventstore.connection'))->transaction(function() use ($table) {
+        DB::connection(config('eventstore.connection'))->transaction(function () use ($table) {
             $schema = Schema::connection(config('eventstore.connection'));
 
-            $schema->create($table, function(Blueprint $builder) {
+            $schema->create($table, function (Blueprint $builder) {
                 $builder->bigIncrements('event_id')->index();
                 $builder->string('event_type')->index();
                 $builder->unsignedInteger('target_id')->nullable()->index();
                 $builder->longText('payload');
                 $builder->longText('metadata')->nullable();
-                $builder->timestamp('created_at')->default(DB::raw("CURRENT_TIMESTAMP"))->index();
+                $builder->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->index();
             });
         });
     }

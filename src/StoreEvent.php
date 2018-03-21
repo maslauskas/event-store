@@ -2,8 +2,8 @@
 
 namespace Maslauskas\EventStore;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 class StoreEvent extends Model
 {
@@ -30,7 +30,7 @@ class StoreEvent extends Model
      */
     protected $casts = [
         'payload' => 'array',
-        'metadata' => 'array'
+        'metadata' => 'array',
     ];
 
     /**
@@ -58,11 +58,11 @@ class StoreEvent extends Model
     {
         $dedicated_tables = config('eventstore.streams');
 
-        if(empty($dedicated_tables)) {
+        if (empty($dedicated_tables)) {
             return config('eventstore.table');
         }
 
-        foreach($dedicated_tables as $table => $events) {
+        foreach ($dedicated_tables as $table => $events) {
             if (array_search($event, $events) !== false) {
                 return $table;
             }
@@ -80,7 +80,7 @@ class StoreEvent extends Model
     public function needsDedicatedStreamTableCreation()
     {
         return $this->getTable() !== config('eventstore.table')
-            && !Schema::connection(config('eventstore.connection'))->hasTable($this->getTable());
+            && ! Schema::connection(config('eventstore.connection'))->hasTable($this->getTable());
     }
 
     /**

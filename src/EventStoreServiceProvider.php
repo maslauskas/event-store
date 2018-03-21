@@ -6,9 +6,6 @@ use Illuminate\Support\ServiceProvider;
 
 class EventStoreServiceProvider extends ServiceProvider
 {
-    /**
-     *
-     */
     public function boot()
     {
         $this->publishes([
@@ -16,23 +13,17 @@ class EventStoreServiceProvider extends ServiceProvider
         ], 'eventstore');
     }
 
-    /**
-     *
-     */
     public function register()
     {
-        $this->mergeConfigFrom( __DIR__.'/../config/eventstore.php', 'eventstore');
+        $this->mergeConfigFrom(__DIR__.'/../config/eventstore.php', 'eventstore');
 
         $this->registerMigrations();
 
-        $this->app->singleton('EventStore', function() {
+        $this->app->singleton('EventStore', function () {
             return new Store;
         });
     }
 
-    /**
-     *
-     */
     protected function registerMigrations()
     {
         return $this->loadMigrationsFrom(__DIR__.'/../database/migrations');

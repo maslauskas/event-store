@@ -8,7 +8,7 @@ return [
 
     'throw_exceptions' => false,
 
-    /**
+    /*
      * Here you can set dedicated tables for certain events to be stored in.
      */
     'streams' => [
@@ -16,5 +16,5 @@ return [
         //     'custom_event_1',
         //     'custom_event_2',
         // ]
-    ]
+    ],
 ];
