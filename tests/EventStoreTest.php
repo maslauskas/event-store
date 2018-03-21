@@ -2,43 +2,43 @@
 
 namespace Tests;
 
-use Maslauskas\EventStore\EventStoreFacade as EventStore;
 use Maslauskas\EventStore\Store;
 use Maslauskas\EventStore\StoreEvent;
+use Maslauskas\EventStore\EventStoreFacade as EventStore;
 
 class EventStoreTest extends EventStoreTestCase
 {
     /** @test */
-    function it_registers_testing_config()
+    public function it_registers_testing_config()
     {
         $this->assertEquals('eventstore', config('eventstore.connection'));
         $this->assertEquals('event_store', config('eventstore.table'));
     }
 
     /** @test */
-    function it_migrates_default_tables_to_database()
+    public function it_migrates_default_tables_to_database()
     {
         $this->assertDatabaseMissing('event_store', []);
     }
 
     /** @test */
-    function it_registers_helper_function()
+    public function it_registers_helper_function()
     {
         $this->assertInstanceOf(Store::class, eventstore());
     }
 
     /** @test */
-    function it_adds_event_to_default_events_table()
+    public function it_adds_event_to_default_events_table()
     {
         EventStore::withExceptions()->add('some_event', ['key' => 'value']);
         $this->assertDatabaseHas('event_store', [
             'event_type' => 'some_event',
-            'payload' => json_encode(['key' => 'value'])
+            'payload' => json_encode(['key' => 'value']),
         ]);
     }
 
     /** @test */
-    function it_gets_table_name_for_event_in_dedicated_table()
+    public function it_gets_table_name_for_event_in_dedicated_table()
     {
         $this->addDedicatedTablesToConfig();
 
@@ -47,7 +47,7 @@ class EventStoreTest extends EventStoreTestCase
     }
 
     /** @test */
-    function it_sets_table_property_on_store_event_model()
+    public function it_sets_table_property_on_store_event_model()
     {
         $this->addDedicatedTablesToConfig();
 
@@ -56,16 +56,16 @@ class EventStoreTest extends EventStoreTestCase
     }
 
     /** @test */
-    function it_creates_custom_event_table()
+    public function it_creates_custom_event_table()
     {
         $this->addDedicatedTablesToConfig();
 
         EventStore::withExceptions()->add('custom_event_1', ['key' => 'value']);
         $this->assertTrue(\Illuminate\Support\Facades\Schema::hasTable('custom_event_table'));
     }
-    
+
     /** @test */
-    function it_does_not_create_custom_table_if_it_already_exists()
+    public function it_does_not_create_custom_table_if_it_already_exists()
     {
         EventStore::createStreamTable('custom_table');
 
@@ -76,19 +76,19 @@ class EventStoreTest extends EventStoreTestCase
     }
 
     /** @test */
-    function it_adds_events_to_dedicated_table()
+    public function it_adds_events_to_dedicated_table()
     {
         $this->addDedicatedTablesToConfig();
 
         EventStore::withExceptions()->add('custom_event_1', ['key' => 'value']);
         $this->assertDatabaseHas('custom_event_table', [
             'event_type' => 'custom_event_1',
-            'payload' => json_encode(['key' => 'value'])
+            'payload' => json_encode(['key' => 'value']),
         ]);
     }
 
     /** @test */
-    function it_inserts_multiple_events_at_once()
+    public function it_inserts_multiple_events_at_once()
     {
         EventStore::withExceptions()->addMany('some_event', [
             ['key' => 'foo'],
@@ -98,12 +98,12 @@ class EventStoreTest extends EventStoreTestCase
 
         $this->assertDatabaseHas('event_store', [
             'event_type' => 'some_event',
-            'payload' => json_encode(['key' => 'baz'])
+            'payload' => json_encode(['key' => 'baz']),
         ]);
     }
 
     /** @test */
-    function it_inserts_multiple_events_at_once_to_dedicated_table()
+    public function it_inserts_multiple_events_at_once_to_dedicated_table()
     {
         $this->addDedicatedTablesToConfig();
 
@@ -115,7 +115,7 @@ class EventStoreTest extends EventStoreTestCase
 
         $this->assertDatabaseHas('custom_event_table', [
             'event_type' => 'custom_event_1',
-            'payload' => json_encode(['key' => 'bar'])
+            'payload' => json_encode(['key' => 'bar']),
         ]);
     }
 }

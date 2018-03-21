@@ -2,9 +2,9 @@
 
 namespace Tests;
 
+use Orchestra\Testbench\TestCase;
 use Maslauskas\EventStore\EventStoreFacade;
 use Maslauskas\EventStore\EventStoreServiceProvider;
-use Orchestra\Testbench\TestCase;
 
 abstract class EventStoreTestCase extends TestCase
 {
@@ -34,7 +34,7 @@ abstract class EventStoreTestCase extends TestCase
     protected function getPackageAliases($app)
     {
         return [
-            'EventStore' => EventStoreFacade::class
+            'EventStore' => EventStoreFacade::class,
         ];
     }
 
@@ -56,9 +56,6 @@ abstract class EventStoreTestCase extends TestCase
         ]);
     }
 
-    /**
-     *
-     */
     public function addDedicatedTablesToConfig()
     {
         $this->app['config']->set('eventstore.streams', [
