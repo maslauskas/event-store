@@ -57,6 +57,7 @@ First, add a dedicated connection to your `config/database.php` file:
 Next, add required environment variables to your `.env` file:
 
 ```env
+EVENT_STORE_CONNECTION="eventstore"
 EVENT_STORE_DATABASE="your_event_store_database_name"
 EVENT_STORE_TABLE="your_event_store_table_name"
 EVENT_STORE_USERNAME="your_event_store_user_name"
